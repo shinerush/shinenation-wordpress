@@ -1,0 +1,25 @@
+# ---------------------------------------------------------------------------
+# Secrets — NEVER commit these.
+# The WordPress Application Password and Hostinger API token live here only.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.local.json
+.mcp.local.json
+credentials.json
+secrets/
+*.pem
+*.key
+
+# Hostinger MCP OAuth credential cache (if ever copied into the repo)
+.config/hostinger-mcp/
+
+# Claude Code local (machine-specific, may contain resolved secrets)
+.claude/settings.local.json
+
+# Tooling
+node_modules/
+vendor/
+.DS_Store
+*.log
