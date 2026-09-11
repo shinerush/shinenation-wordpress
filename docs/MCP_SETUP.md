@@ -33,7 +33,8 @@ Add Hostinger MCP only when you actually need DNS, backups, or cache control.
 This repository is currently checked out in a **Claude Code cloud sandbox**,
 and that sandbox's network policy **blocks outbound traffic to
 `shinenationtech.com`** (verified: the egress proxy answers `403` to
-`CONNECT shinenationtech.com:443`). It also blocks `hostinger.com`.
+`CONNECT shinenationtech.com:443`). It also blocks `hostinger.com` and
+`mcp.hostinger.com`, so the hosted Hostinger server is unreachable here too.
 
 Consequences:
 
@@ -75,7 +76,14 @@ cd shinenation-wordpress
 cp .env.example .env
 # edit .env with your real values
 chmod 600 .env
+
+cp .mcp.json.example .mcp.json   # live config; git-ignored
 ```
+
+The live `.mcp.json` is deliberately **not** committed. A committed one
+auto-loads in every session that opens this repo — including cloud sandboxes
+that cannot reach the site — and fails on startup every time. Copying it into
+place per machine keeps it opt-in.
 
 `.env` is listed in `.gitignore`, together with `credentials.json`, `*.key`,
 and `.claude/settings.local.json`. Confirm before your first commit:
@@ -138,17 +146,26 @@ In order of likelihood:
 
 ## 6. Connect the WordPress MCP server
 
-The repo ships a project-scoped `.mcp.json` that reads credentials from your
-environment, so no secret ever lands in a tracked file. Launch Claude Code
-with the variables loaded:
+Your `.mcp.json` (copied from `.mcp.json.example` in step 4) reads
+credentials from your environment, so no secret lands in a tracked file.
+Launch Claude Code with the variables loaded:
 
 ```bash
 set -a; source .env; set +a
 claude
 ```
 
-Claude Code will prompt once to approve the project-scoped servers in
-`.mcp.json`. Approve `wordpress`.
+Claude Code prompts once to approve the project-scoped servers. Approve
+`wordpress`. If you do not need DNS, backups, or cache control, delete the
+`hostinger` entry from your `.mcp.json` — otherwise every session start asks
+you to complete its OAuth sign-in.
+
+**Loading order matters.** The variables must be exported *before* `claude`
+starts. If they are missing, Claude Code passes the literal text
+`${WORDPRESS_USERNAME}` through to the server, which rejects it with
+`Username contains invalid characters`, exits, and surfaces in Claude Code as
+`wordpress (CONNECTION_CLOSED): "Connection closed"`. That error means
+"credentials never reached the server" — not that your password is wrong.
 
 Verify inside Claude Code:
 
@@ -240,6 +257,7 @@ There is no per-password scoping in WordPress core.
 
 - [ ] Running on a machine that can reach shinenationtech.com (not the cloud sandbox)
 - [ ] `.env` created, `chmod 600`, confirmed ignored by git
+- [ ] `.mcp.json` copied from the template on this machine
 - [ ] `./scripts/verify-wp-connection.sh` passes all critical checks
 - [ ] `/mcp` shows `wordpress` connected
 - [ ] Role of the integration user reviewed and reduced where possible

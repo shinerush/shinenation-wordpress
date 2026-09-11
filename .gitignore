@@ -7,6 +7,11 @@
 !.env.example
 *.local.json
 .mcp.local.json
+
+# Live MCP config — generated from .mcp.json.example on the machine that runs
+# the servers. Ignored so it never auto-loads (and fails) in a cloud sandbox.
+.mcp.json
+!.mcp.json.example
 credentials.json
 secrets/
 *.pem

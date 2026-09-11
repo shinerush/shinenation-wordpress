@@ -1,0 +1,31 @@
+{
+  "$comment": [
+    "TEMPLATE \u2014 copy to .mcp.json on the machine that will run the servers:",
+    "    cp .mcp.json.example .mcp.json",
+    ".mcp.json is git-ignored so it never auto-loads in a cloud sandbox, which",
+    "cannot reach shinenationtech.com or mcp.hostinger.com.",
+    "NO SECRETS HERE. Credentials resolve from the environment via ${VAR}:",
+    "    set -a; source .env; set +a; claude",
+    "Drop the 'hostinger' entry unless you need DNS/backups/cache.",
+    "See docs/MCP_SETUP.md."
+  ],
+  "mcpServers": {
+    "wordpress": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-wordpress"
+      ],
+      "env": {
+        "WORDPRESS_SITE_URL": "${WORDPRESS_SITE_URL:-https://shinenationtech.com}",
+        "WORDPRESS_USERNAME": "${WORDPRESS_USERNAME}",
+        "WORDPRESS_APP_PASSWORD": "${WORDPRESS_APP_PASSWORD}"
+      }
+    },
+    "hostinger": {
+      "type": "http",
+      "url": "https://mcp.hostinger.com"
+    }
+  }
+}
